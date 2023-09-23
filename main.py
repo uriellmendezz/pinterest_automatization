@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 from time import sleep
 import os
+import json
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -24,8 +25,11 @@ clean_screen()
 path_to_chromedriver = ''
 path_to_chrome_executable = ''
 
-pinterest_username = input('Nombre de usuario de Pinterest: ')
-pinterest_password = input('Contraseña de Pinterest: ')
+with open('profile_data.json', 'r') as f:
+    data = json.load(f)
+
+pinterest_username = data['email']
+pinterest_password = data['password']
 
 clean_screen()
 
@@ -36,70 +40,139 @@ options.binary_location = path_to_chrome_executable
 driver = webdriver.Chrome(path_to_chromedriver, options = options)
 driver.get('https://ar.pinterest.com/')
 
-
-# 1. INICIAR SESION EN PINTEREST
-login_button = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Iniciar sesión')]"))
-)
-login_button.click()
-
-# Encuentra los campos de usuario y contraseña
-username_field = driver.find_element(By.NAME, 'id')
-password_field = driver.find_element(By.NAME, 'password')
-
-# Envia los valores al campo
-username_field.send_keys(pinterest_username)
-password_field.send_keys(pinterest_password)
-
-sleep(3)
-
-titulos = ['TITULO 1', 'TITULO 2', 'TITULO 3', 'TITULO 4']
-
-for i,e in enumerate(titulos):
-    # 2. PULSAR EL BOTON DE 'CREAR' PARA CREAR UN PIN
-
-    crear_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Crear')]"))
+try:
+    # 1. INICIAR SESION EN PINTEREST
+    login_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Iniciar sesión')]"))
     )
-    crear_button.click()
+    login_button.click()
 
-    crear_pin_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Crear Pin')]"))
-    )
-    crear_pin_button.click()
+    # Encuentra los campos de usuario y contraseña
+    username_field = driver.find_element(By.NAME, 'id')
+    password_field = driver.find_element(By.NAME, 'password')
+
+    # Envia los valores al campo
+    username_field.send_keys(pinterest_username)
+    password_field.send_keys(pinterest_password)
 
     sleep(3)
 
-    # Cargar Imagen del Pin
-    file_input = driver.find_element(By.XPATH, "//input[@aria-label='Carga de archivo']")
+    titulos = ['TITULO 1', 'TITULO 2', 'TITULO 3', 'TITULO 4']
 
-    # Enviar la ruta del archivo al elemento de entrada de archivo
-    file_input.send_keys('C:/Documents/Pinterest Project/Foto Perfil Henry 2.png')
+    for i,e in enumerate(titulos):
+        # 2. PULSAR EL BOTON DE 'CREAR' PARA CREAR UN PIN
 
-    # Esperar un momento para que la carga de archivos se complete (puedes ajustar este tiempo según sea necesario)
-    driver.implicitly_wait(10)
+        crear_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Crear')]"))
+        )
+        crear_button.click()
 
-    titulo = driver.find_element(By.XPATH, f"//textarea[@placeholder='Agrega un título']")
+        crear_pin_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Crear Pin')]"))
+        )
+        crear_pin_button.click()
 
-    # Ingresa tu nombre de usuario y contraseña
-    username = 'Este es el titulo'
-    titulo.send_keys(e)
+        sleep(3)
 
-    desc = driver.find_element(By.XPATH, "//div[@aria-label='Cuéntales a todos de qué se trata tu Pin']")
+        # Cargar Imagen del Pin
+        file_input = driver.find_element(By.XPATH, "//input[@aria-label='Carga de archivo']")
 
-    texto = 'Esta es la descripcion que elegi'
-    desc.send_keys(i)
+        # Enviar la ruta del archivo al elemento de entrada de archivo
+        file_input.send_keys('C:/Documents/Pinterest Project/Foto Perfil Henry 2.png')
 
-    # Guardar
-    guardar_button = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Guardar')]"))
-    )
-    guardar_button.click()
+        # Esperar un momento para que la carga de archivos se complete (puedes ajustar este tiempo según sea necesario)
+        driver.implicitly_wait(10)
 
-    sleep(5)
+        titulo = driver.find_element(By.XPATH, f"//textarea[@placeholder='Agrega un título']")
 
-    driver.get('https://ar.pinterest.com/')
+        # Ingresa tu nombre de usuario y contraseña
+        username = 'Este es el titulo'
+        titulo.send_keys(e)
 
-    sleep(5)
+        desc = driver.find_element(By.XPATH, "//div[@aria-label='Cuéntales a todos de qué se trata tu Pin']")
 
-driver.quit()
+        texto = 'Esta es la descripcion que elegi'
+        desc.send_keys(i)
+
+        # Guardar
+        guardar_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Guardar')]"))
+        )
+        guardar_button.click()
+
+        sleep(5)
+
+        driver.get('https://ar.pinterest.com/')
+
+        sleep(5)
+
+    driver.quit()
+
+except Exception:
+        
+        # 1. INICIAR SESION EN PINTEREST EN PAGINA DE INGLES
+        login_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Log in')]"))
+        )
+        login_button.click()
+
+        # Encuentra los campos de usuario y contraseña
+        username_field = driver.find_element(By.NAME, 'id')
+        password_field = driver.find_element(By.NAME, 'password')
+
+        # Envia los valores al campo
+        username_field.send_keys(pinterest_username)
+        password_field.send_keys(pinterest_password)
+
+        sleep(3)
+
+        titulos = ['TITULO 1', 'TITULO 2', 'TITULO 3', 'TITULO 4']
+
+        for i,e in enumerate(titulos):
+            # 2. PULSAR EL BOTON DE 'CREAR' PARA CREAR UN PIN
+
+            crear_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Create')]"))
+            )
+            crear_button.click()
+
+            crear_pin_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Create Pin')]"))
+            )
+            crear_pin_button.click()
+
+            sleep(3)
+
+            # Cargar Imagen del Pin
+            file_input = driver.find_element(By.XPATH, "//input[@aria-label='File upload']")
+
+            # Enviar la ruta del archivo al elemento de entrada de archivo
+            file_input.send_keys('C:/Documents/Pinterest Project/Foto Perfil Henry 2.png')
+
+            # Esperar un momento para que la carga de archivos se complete (puedes ajustar este tiempo según sea necesario)
+            driver.implicitly_wait(10)
+
+            titulo = driver.find_element(By.XPATH, f"//textarea[@placeholder='Add your title']")
+
+            # Ingresa tu nombre de usuario y contraseña
+            username = 'Este es el titulo'
+            titulo.send_keys(e)
+
+            desc = driver.find_element(By.XPATH, "//div[@aria-label='Tell everyone what is ypur Pin about']")
+
+            texto = 'Esta es la descripcion que elegi'
+            desc.send_keys(i)
+
+            # Guardar
+            guardar_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Publish')]"))
+            )
+            guardar_button.click()
+
+            sleep(5)
+
+            driver.get('https://ar.pinterest.com/')
+
+            sleep(5)
+
+        driver.quit()

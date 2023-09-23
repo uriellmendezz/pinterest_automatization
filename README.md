@@ -43,6 +43,14 @@ path_to_chromedriver = ''
 path_to_chrome_executable = ''
 ```
 
+### 9. Colocar los datos de tu cuenta de Pinterest en el archivo `profile_data.json`.
+```json
+{
+    "email":"your-email@gmail.com",
+    "password":"your-password"
+}
+```
+
 ## 9. Ejecutar el script `main.py`
 ```bash
 python main.py
