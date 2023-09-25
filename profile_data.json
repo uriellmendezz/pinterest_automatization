@@ -1,4 +1,8 @@
 {
     "email":"your-email@gmail.com",
-    "password":"your-password"
+    "password":"your-password",
+    "title": "title",
+    "description": "description",
+    "link": "link",
+    "path": "img-path"
 }
