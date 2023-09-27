@@ -4,6 +4,9 @@ import time
 from time import sleep
 import os
 import random
+import smtplib
+import ssl
+from email.message import EmailMessage
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -15,9 +18,34 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 path_driver = 'C:/Users/uriel/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe'
 path_chrome = 'C:/Program Files/Google/Chrome/Application/chrome.exe'
-df_accounts = pd.read_excel('accounts_excel.xlsx')
 
+# INSERTAR EL PATH DEL CROMEDRIVER Y EL EJECUTABLE DE GOOGLE CHROME
+# Ejemplo:
+    #path_to_chromedriver = 'C:/Users/uriel/Downloads/chromedriver-win64/chromedriver-win64/chromedriver.exe'
+    #path_to_chrome_executable = 'C:/Program Files/Google/Chrome/Application/chrome.exe'
+
+#path_to_chromedriver = ''
+#path_to_chrome_executable = ''
+
+df_accounts = pd.read_excel('../accounts_excel.xlsx')
 df_accounts['PATH TO IMAGES'] = df_accounts['PATH TO IMAGES'].str.strip('"').replace("\\",'/')
+
+def Send_Email(receiver_email, subject, body):
+    sender_email = 'mybestfriendbot@gmail.com'  # Reemplaza con tu dirección de correo electrónico
+    with open('../password.txt', 'r') as f:
+        password = f.read().strip()
+
+    em = EmailMessage()
+    em['From'] = sender_email
+    em['To'] = receiver_email
+    em['Subject'] = subject
+    em.set_content(body)
+
+    context = ssl.create_default_context()
+
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context= context) as smtp:
+        smtp.login(sender_email, password)
+        smtp.sendmail(sender_email, receiver_email, em.as_string())
 
 # INICIARLIZAR EL WEB DRIVER (NAVEGADOR)
 options = webdriver.ChromeOptions()
@@ -35,10 +63,12 @@ def Random_Duration_Action(start, end):
         current_num += 0.01
 
     random_number = random.choice(lista_numeros)
+    print(random_number)
     return sleep(random_number)
 
 def Open_Pinterest():
     driver.get('https://ar.pinterest.com/')
+    Random_Duration_Action(3,4)
 
 def Log_In(email, password):
     # 1. INICIAR SESION EN PINTEREST
@@ -88,16 +118,17 @@ def Load_Images(path_to_imgs):
         try:
             file_input = driver.find_element(By.XPATH, "//input[@aria-label='Carga de archivo']")
             file_input.send_keys(path_to_imgs  + '/' + fotos[i])
-            os.remove(path_to_imgs  + '/' + fotos[i])
-            Random_Duration_Action(2,4.5)
+            #os.remove(path_to_imgs  + '/' + fotos[i])
+            Random_Duration_Action(0.5,2.5)
             boton = driver.find_element(By.XPATH, '//button[@style="background-color: rgb(255, 255, 255); border: 0px; border-radius: 8px; box-sizing: border-box; cursor: pointer; height: 60px; outline: none; padding: 0px; width: 40px;"]')
             boton.click()
-            Random_Duration_Action(2.63,3.2)
+            Random_Duration_Action(1.33,4.2)
         except Exception:
             pass
 
     file_input = driver.find_element(By.XPATH, "//input[@aria-label='Carga de archivo']")
     file_input.send_keys(path_to_imgs + '/' + last_one)
+    #os.remove(path_to_imgs  + '/' + last_one)
 
     Random_Duration_Action(2,4)
 
@@ -138,6 +169,12 @@ def Edit_Pins(title_, description_, link_):
 
     Random_Duration_Action(1.5,2.6)
 
+def Count_Pins():
+    number_of_pins = driver.find_element(By.XPATH, '//div[@class="tBJ dyH iFc sAJ O2T zDA IZT swG"]')
+    total = number_of_pins.text
+    number = int(total.split()[0])
+    return number
+
 def Publish_Pins():
     publish_button = driver.find_element(By.XPATH, '//div[contains(text(), "Publicar")]')
     publish_button.click()
@@ -159,12 +196,19 @@ def Turn_Off_WebDriver():
     driver.quit()
 
 if __name__ == '__main__':
+    general_time_start = time.time()
+
+    accounts = []
+    total_pins = []
+    time_executed = []
+
     for number_account in range(len(df_accounts)):
+        start_time = time.time()
         #1
         Open_Pinterest()
         #2
-        Log_In(email = df_accounts.iloc[number_account]['EMAIL'],
-               password = df_accounts.iloc[number_account]['PASSWORD'])
+        Log_In(email = df_accounts.iloc[number_account]['PINTEREST EMAIL'],
+               password = df_accounts.iloc[number_account]['PINTEREST PASSWORD'])
         #3
         Create_Pin()
         #4
@@ -172,12 +216,49 @@ if __name__ == '__main__':
         #5
         Edit_Pins(title_ = df_accounts.iloc[number_account]['PINS TITLE'],
                   description_ = df_accounts.iloc[number_account]['PINS DESCRIPTION'],
-                  link_ = df_accounts.iloc[number_account]['LINK'])
+                  link_ = df_accounts.iloc[number_account]['PINS LINK'])
+        
+        number_of_pins = Count_Pins()
         #6
         Publish_Pins()
+
         #7
         Log_Out()
-        sleep(random.choice(range(67,126)))
+
+        finish_time = time.time()
+
+        total_time = finish_time - start_time
+        h, rem = divmod(total_time, 3600)
+        m, s = divmod(rem, 60)
+        formatted_time = '{:0>2}:{:0>2}:{:0>2}'.format(int(h), int(m), int(s))
+
+        accounts.append(df_accounts.iloc[number_account]['ACCOUNT NAME'])
+        total_pins.append(number_of_pins)
+        time_executed.append(formatted_time)
+
+        if number_account == len(df_accounts):
+            break
+        else:
+            Random_Duration_Action(63,138)
+
+    general_time_finish = time.time()
+    general_time_total = general_time_finish - general_time_start
+    h, rem = divmod(general_time_total, 3600)
+    m, s = divmod(rem, 60)
+    general_formatted_time = '{:0>2}:{:0>2}:{:0>2}'.format(int(h), int(m), int(s))
+
+    body = ''
+    for i,e in enumerate(accounts):
+        message = f'''Cuenta: {e}\n - Total de Pines subidos: {total_pins[i]}\n - Duración del proceso: {time_executed[i]}\n\n'''
+        body += message
+
+    body += f'\nDuración total del proceso: {general_formatted_time}'
+
+    Send_Email(
+        receiver_email = df_accounts.iloc[number_account]['YOUR GMAIL'],
+        subject='Carga de Pines a Pinterest',
+        body=body
+    )
 
     Turn_Off_WebDriver()
 
