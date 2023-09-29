@@ -138,7 +138,7 @@ def Create_Pin():
 upload_images = []
 
 def Load_Images(path_to_imgs):
-    fotos = os.listdir(path_to_imgs)[:5]
+    fotos = os.listdir(path_to_imgs)[:20]
     last_one = fotos[-1]
     
     # Carpeta para imágenes pequeñas
@@ -264,6 +264,9 @@ if __name__ == '__main__':
         number_of_pins = Count_Pins()
         #6
         Publish_Pins()
+
+        Random_Duration_Action(start =  len(number_of_pins) * 2.5,
+                               end   =  (len(number_of_pins) * 2.5) + 5)
 
         #7
         Log_Out()
