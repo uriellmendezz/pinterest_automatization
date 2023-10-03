@@ -23,6 +23,7 @@ class PinterestClient:
         self.path_to_chrome_exe = chrome_exe_path
         self.driver = None
         self.upload_images = []
+        self.small_images = []
 
     def Initialize_WebDriver(self):
         options = webdriver.ChromeOptions()
@@ -129,39 +130,42 @@ class PinterestClient:
         fotos = os.listdir(path_to_imgs)[:20]
         last_one = fotos[-1]
         
-        # Carpeta para imágenes pequeñas
+        path_to_imgs = path_to_imgs.replace('\\','/').strip()
         small_images_folder = os.path.join(path_to_imgs + '/' + 'small_images')
         os.makedirs(small_images_folder, exist_ok=True)
 
         for i in range(len(fotos) - 1):
             try:
                 image_path = path_to_imgs  + '/' + fotos[i]
-                if self.is_small_image(image_path) == True:
-                    # Mover a la carpeta de imágenes pequeñas
-                    os.rename(image_path, small_images_folder + '/' + fotos[i])
+                if os.path.isdir(image_path):
+                    continue
                 else:
-                    # Subir la imagen
-                    file_input = self.driver.find_element(By.XPATH, "//input[@aria-label='File upload']")
-                    file_input.send_keys(image_path)
-                    self.upload_images.append(image_path)
-                    self.Random_Duration_Action(0.5, 2.5)
-                    boton = self.driver.find_element(By.XPATH, '//button[@style="background-color: rgb(255, 255, 255); border: 0px; border-radius: 8px; box-sizing: border-box; cursor: pointer; height: 60px; outline: none; padding: 0px; width: 40px;"]')
-                    boton.click()
-                    self.Random_Duration_Action(1.33, 4.2)
+                    if self.is_small_image(image_path) == True:
+                        os.rename(image_path, small_images_folder + '/' + fotos[i])
+                    else:
+                        # Subir la imagen
+                        file_input = self.driver.find_element(By.XPATH, "//input[@aria-label='File upload']")
+                        file_input.send_keys(image_path)
+                        self.upload_images.append(image_path)
+                        self.Random_Duration_Action(0.5, 2.5)
+                        boton = self.driver.find_element(By.XPATH, '//button[@style="background-color: rgb(255, 255, 255); border: 0px; border-radius: 8px; box-sizing: border-box; cursor: pointer; height: 60px; outline: none; padding: 0px; width: 40px;"]')
+                        boton.click()
+                        self.Random_Duration_Action(1.33, 4.2)
             except Exception:
                 pass
 
-        # Subir la última imagen
         last_image_path = path_to_imgs  + '/' + last_one
-        if self.is_small_image(last_image_path) == True:
-            # Mover a la carpeta de imágenes pequeñas
-            os.rename(last_image_path, small_images_folder + '/' + last_one)
+        if os.path.isdir(last_image_path):
+            pass
         else:
-            # Subir la imagen
-            file_input = self.driver.find_element(By.XPATH, "//input[@aria-label='File upload']")
-            file_input.send_keys(last_image_path)
-            self.upload_images.append(last_image_path)
-            self.Random_Duration_Action(2, 4)
+            if self.is_small_image(last_image_path) == True:
+                os.rename(last_image_path, small_images_folder + '/' + fotos[i])
+            else:
+                # Subir la imagen
+                file_input = self.driver.find_element(By.XPATH, "//input[@aria-label='File upload']")
+                file_input.send_keys(last_image_path)
+                self.upload_images.append(last_image_path)
+                self.Random_Duration_Action(2, 4)
 
     def Edit_Pins(self,title_, description_, link_):
 
@@ -209,6 +213,10 @@ class PinterestClient:
     def Publish_Pins(self):
         publish_button = self.driver.find_element(By.XPATH, '//div[contains(text(), "Publish")]')
         publish_button.click()
+
+    def Delete_Images(self):
+        for img in self.upload_images:
+            os.remove(img)
 
     def Log_Out(self):
         self.driver.get('https://ar.pinterest.com/')

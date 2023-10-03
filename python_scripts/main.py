@@ -3,22 +3,33 @@ import pandas as pd
 import os
 import json
 import time
+import json
 
-df_accounts = pd.read_excel('../accounts_excel.xlsx')
-df_accounts['PATH TO IMAGES'] = df_accounts['PATH TO IMAGES'].str.strip('"').replace("\\",'/')
+import json
 
-with open('../paths.json', 'r') as jfile:
-    data = json.load(jfile)
-
-path_webdriver = data['WebDriver_Path'].replace('\\','/').strip()
-path_googlechrome = data['Chrome_Path'].replace('\\','/').strip()
-
-client = PinterestClient(webdriver_path = path_webdriver,
-                         chrome_exe_path = path_googlechrome)
-
-client.Initialize_WebDriver()
+def are_json_values_empty(json_file):
+    with open(json_file, 'r') as file:
+        data = json.load(file)
+        return all(value == '' or value is None for value in data.values())
 
 if __name__ == '__main__':
+    df_accounts = pd.read_excel('../accounts_excel.xlsx')
+    df_accounts['PATH TO IMAGES'] = df_accounts['PATH TO IMAGES'].str.strip('"').replace("\\",'/')
+
+    if are_json_values_empty('../paths.json') == True:
+        with open('../paths_owner.json', 'r') as jfile:
+            data = json.load(jfile)
+    else:
+        with open('../paths.json', 'r') as jfile:
+            data = json.load(jfile)
+
+    path_webdriver = data['WebDriver_Path'].replace('\\','/').strip()
+    path_googlechrome = data['Chrome_Path'].replace('\\','/').strip()
+
+    client = PinterestClient(webdriver_path = path_webdriver,
+                            chrome_exe_path = path_googlechrome)
+
+    client.Initialize_WebDriver()
     general_time_start = time.time()
 
     accounts = []
@@ -45,8 +56,14 @@ if __name__ == '__main__':
         #6
         client.Publish_Pins()
 
-        client.Random_Duration_Action(start =  len(number_of_pins) * 2.5,
-                               end   =  (len(number_of_pins) * 2.5) + 5)
+        client.Random_Duration_Action(
+            start =  int(number_of_pins) * 2.5,
+            end   = (int(number_of_pins) * 2.5) + 10
+        )
+
+        client.Delete_Images()
+
+        client.Random_Duration_Action(10,20)
 
         #7
         client.Log_Out()
@@ -62,7 +79,7 @@ if __name__ == '__main__':
         if number_account == len(df_accounts):
             break
         else:
-            client.Random_Duration_Action(63,138)
+            client.Random_Duration_Action(36,78)
 
     general_time_finish = time.time()
     total_general_time = client.duration(general_time_start, general_time_finish)
