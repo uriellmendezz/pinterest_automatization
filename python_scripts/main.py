@@ -13,7 +13,7 @@ def are_json_values_empty(json_file):
         return all(value == '' or value is None for value in data.values())
 
 if __name__ == '__main__':
-    df_accounts = pd.read_excel('../accounts_excel.xlsx')
+    df_accounts = pd.read_excel('C:/Users/francomendezok/Documents/Franco/accounts.xlsx')
     df_accounts['PATH TO IMAGES'] = df_accounts['PATH TO IMAGES'].str.strip('"').replace("\\",'/')
 
     if are_json_values_empty('../paths.json') == True:
