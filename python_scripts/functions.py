@@ -111,10 +111,16 @@ class PinterestClient:
         self.Random_Duration_Action(5,7)
 
     def Create_Pin(self):
-        crear_button = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Create')]"))
-        )
-        crear_button.click()
+        try:
+            crear_button = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Create')]"))
+            )
+            crear_button.click()
+        except Exception as e:
+            crear_button = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Business hub')]"))
+            )
+            crear_button.click()
 
         self.Random_Duration_Action(1.4,2.13)
 
@@ -124,7 +130,6 @@ class PinterestClient:
         crear_pin_button.click()
 
         self.Random_Duration_Action(2,5)
-
 
     def Load_Images(self, path_to_imgs):
         fotos = os.listdir(path_to_imgs)[:20]

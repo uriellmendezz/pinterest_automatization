@@ -5,8 +5,6 @@ import json
 import time
 import json
 
-import json
-
 def are_json_values_empty(json_file):
     with open(json_file, 'r') as file:
         data = json.load(file)
