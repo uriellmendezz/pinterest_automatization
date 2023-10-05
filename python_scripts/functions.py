@@ -113,7 +113,7 @@ class PinterestClient:
     def Create_Pin(self):
         try:
             crear_button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Create')]"))
+                EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Create')] | //div[contains(text(), 'Business hub')]"))
             )
             crear_button.click()
 
@@ -124,19 +124,8 @@ class PinterestClient:
             )
             crear_pin_button.click()
 
-        except Exception as e:
-            crear_button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Business hub')]"))
-            )
-            crear_button.click()
-
-            self.Random_Duration_Action(1.4,2.13)
-
-            crear_pin_button = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Create Pin')] | //div[contains(text(), 'Create Pin')]"))
-            )
-            crear_pin_button.click()
-
+        except TimeoutException as e:
+            pass
         
         self.Random_Duration_Action(2,5)
 
