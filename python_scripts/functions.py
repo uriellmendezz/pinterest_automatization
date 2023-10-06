@@ -117,7 +117,7 @@ class PinterestClient:
             )
             crear_button.click()
 
-            self.Random_Duration_Action(1.4,2.13)
+            self.Random_Duration_Action(2.1,3.5)
 
             crear_pin_button = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Create Pin')] | //div[contains(text(), 'Create Pin')]"))
@@ -217,6 +217,9 @@ class PinterestClient:
         publish_button = self.driver.find_element(By.XPATH, '//div[contains(text(), "Publish")]')
         publish_button.click()
 
+    def Get_Images(self):
+        return self.upload_images
+
     def Delete_Images(self):
         for img in self.upload_images:
             os.remove(img)
@@ -231,7 +234,7 @@ class PinterestClient:
 
         self.Random_Duration_Action(1,1.7)
 
-        log_out = self.driver.find_element(By.XPATH, '//span[contains(text(), "Log out")]')
+        log_out = self.driver.find_element(By.XPATH, '//span[contains(text(), "Log out")] | //div[contains(text(), "Log out")]')
         log_out.click()
 
     def Turn_Off_WebDriver(self):

@@ -34,6 +34,8 @@ if __name__ == '__main__':
     total_pins = []
     time_executed = []
 
+    imgs = []
+
     for number_account in range(len(df_accounts)):
         start_time = time.time()
         #1
@@ -59,7 +61,9 @@ if __name__ == '__main__':
             end   = (int(number_of_pins) * 2.5) + 10
         )
 
-        client.Delete_Images()
+        images = client.Get_Images()
+        for img in images:
+            imgs.append(img)
 
         client.Random_Duration_Action(10,20)
 
@@ -94,6 +98,12 @@ if __name__ == '__main__':
         subject='Uploading Pins to Pinterest',
         body=body
     )
+
+    for i in imgs:
+        try:
+            os.remove(i)
+        except Exception:
+            pass
 
     client.Turn_Off_WebDriver()
 
