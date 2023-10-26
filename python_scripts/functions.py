@@ -62,7 +62,7 @@ class PinterestClient:
     def is_small_image(self, image_path):
         with Image.open(image_path) as img:
             width, height = img.size
-            if width < 100 or height < 100:
+            if width < 200 or height < 300:
                 return True
             else:
                 return False
@@ -91,13 +91,11 @@ class PinterestClient:
             )
             login_button.click()
 
-        # Encuentra los campos de usuario y contraseña
         username_field = self.driver.find_element(By.NAME, 'id')
         password_field = self.driver.find_element(By.NAME, 'password')
 
         self.Random_Duration_Action(1,3)
 
-        # Envia los valores al campo
         username_field.send_keys(email)
 
         self.Random_Duration_Action(0.5,2)
@@ -111,25 +109,12 @@ class PinterestClient:
         self.Random_Duration_Action(5,7)
 
     def Create_Pin(self):
-        try:
-            crear_button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//div[contains(text(), 'Create')] | //div[contains(text(), 'Business hub')]"))
-            )
-            crear_button.click()
+        create_pin = self.driver.get('https://ar.pinterest.com/pin-creation-tool/')
+        wait = WebDriverWait(self.driver, 30)
+        wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        self.Random_Duration_Action(0.1,0.2)
 
-            self.Random_Duration_Action(2.1,3.5)
-
-            crear_pin_button = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'Create Pin')] | //div[contains(text(), 'Create Pin')]"))
-            )
-            crear_pin_button.click()
-
-        except TimeoutException as e:
-            pass
-        
-        self.Random_Duration_Action(2,5)
-
-    def Load_Images(self, path_to_imgs):
+    def Load_Images(self, path_to_imgs,title_, description_, link_,board_):
         fotos = os.listdir(path_to_imgs)[:20]
         last_one = fotos[-1]
         
@@ -146,14 +131,33 @@ class PinterestClient:
                     if self.is_small_image(image_path) == True:
                         os.rename(image_path, small_images_folder + '/' + fotos[i])
                     else:
-                        # Subir la imagen
-                        file_input = self.driver.find_element(By.XPATH, "//input[@aria-label='File upload']")
+                        wait = WebDriverWait(self.driver, 30)
+                        wait.until(EC.presence_of_element_located((By.XPATH, '//input[@aria-label="File Upload"]')))
+                        file_input = self.driver.find_element(By.XPATH, '//input[@aria-label="File Upload"]')
                         file_input.send_keys(image_path)
                         self.upload_images.append(image_path)
                         self.Random_Duration_Action(0.5, 2.5)
-                        boton = self.driver.find_element(By.XPATH, '//button[@style="background-color: rgb(255, 255, 255); border: 0px; border-radius: 8px; box-sizing: border-box; cursor: pointer; height: 60px; outline: none; padding: 0px; width: 40px;"]')
-                        boton.click()
-                        self.Random_Duration_Action(1.33, 4.2)
+                        title = self.driver.find_element(By.XPATH, '//input[@placeholder="Add a title"]')
+                        title.send_keys(title_)
+                        self.Random_Duration_Action(0.5, 2.5)
+                        description = self.driver.find_element(By.XPATH, '//div[@aria-label="Add a detailed description"]')
+                        description.send_keys(description_)
+                        self.Random_Duration_Action(0.5, 2.5)
+                        link = self.driver.find_element(By.XPATH, '//input[@placeholder="Add a link"]')
+                        link.send_keys(link_)
+                        self.Random_Duration_Action(0.5, 2.5)
+                        board = self.driver.find_element(By.XPATH, '//button[@data-test-id="board-dropdown-select-button"]')
+                        board.click()
+                        self.Random_Duration_Action(0.5, 2.5)
+                        board = self.driver.find_element(By.XPATH, '//input[@aria-label="Search through your boards"]')
+                        board.send_keys(board_)
+                        self.Random_Duration_Action(0.5, 2.5)
+                        board_box = self.driver.find_element(By.XPATH, f'//div[contains(text(), "{board_}")]')
+                        board_box.click()
+                        self.Random_Duration_Action(0.5, 2.5)
+                        publish = self.driver.find_element(By.XPATH, '//div[contains(text(), "Publish")]')
+                        publish.click()
+                        self.Random_Duration_Action(10, 16)
             except Exception:
                 pass
 
@@ -164,11 +168,33 @@ class PinterestClient:
             if self.is_small_image(last_image_path) == True:
                 os.rename(last_image_path, small_images_folder + '/' + fotos[i])
             else:
-                # Subir la imagen
-                file_input = self.driver.find_element(By.XPATH, "//input[@aria-label='File upload']")
+                wait = WebDriverWait(self.driver, 30)
+                wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+                file_input = self.driver.find_element(By.XPATH, '//input[@aria-label="File Upload"]')
                 file_input.send_keys(last_image_path)
                 self.upload_images.append(last_image_path)
-                self.Random_Duration_Action(2, 4)
+                self.Random_Duration_Action(0.5, 2.5)
+                title = self.driver.find_element(By.XPATH, '//input[@placeholder="Add a title"]')
+                title.send_keys(title_)
+                self.Random_Duration_Action(0.5, 2.5)
+                description = self.driver.find_element(By.XPATH, '//div[@aria-label="Add a detailed description"]')
+                description.send_keys(description_)
+                self.Random_Duration_Action(0.5, 2.5)
+                link = self.driver.find_element(By.XPATH, '//input[@placeholder="Add a link"]')
+                link.send_keys(link_)
+                self.Random_Duration_Action(0.5, 2.5)
+                board = self.driver.find_element(By.XPATH, '//button[@data-test-id="board-dropdown-select-button"]')
+                board.click()
+                self.Random_Duration_Action(0.5, 2.5)
+                board = self.driver.find_element(By.XPATH, '//input[@aria-label="Search through your boards"]')
+                board.send_keys(board_)
+                self.Random_Duration_Action(0.5, 2.5)
+                board_box = self.driver.find_element(By.XPATH, f'//div[contains(text(), "{board_}")]')
+                board_box.click()
+                self.Random_Duration_Action(0.5, 2.5)
+                publish = self.driver.find_element(By.XPATH, '//div[contains(text(), "Publish")]')
+                publish.click()
+                self.Random_Duration_Action(10, 16)
 
     def Edit_Pins(self,title_, description_, link_):
 

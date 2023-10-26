@@ -12,13 +12,7 @@ def are_json_values_empty(json_file):
     
 
 if __name__ == '__main__':
-    dir = os.listdir('..')
-    for elemento in dir:
-        if elemento.endswith(".xlsx"):
-            archivo_excel = elemento
-            break
-        else:
-            print("No se encontro el archivo")
+    archivo_excel = '../accounts_excel.xlsx'
 
     df_accounts = pd.read_excel(archivo_excel)
     df_accounts['PATH TO IMAGES'] = df_accounts['PATH TO IMAGES'].str.strip('"').replace("\\",'/')
